@@ -80,6 +80,17 @@ class Instructor extends Person{
     }
     demo (subject){return `Today we are learning about ${subject}.`};
     grade (student, subject){return `${student.name} receives a perfect score on ${subject}!`};
+    scoring(student) {
+        let min = 0;
+        let max = 10;
+        let score = Math.floor(Math.random() * (max - min)) + min;
+        student.grade = student.grade + score;
+        if (score === 0){
+            return `Dude, ${student.name} you got a zero, let's keep studying and try again!`
+        }else {
+            return `${this.name} says ${student.name} scored ${score} and now has a total of ${student.grade}!`
+        }
+    }
 }
 
 class Student extends Person{
@@ -87,11 +98,19 @@ class Student extends Person{
         super(att);
         this.previousBackground = att.previousBackground,
         this.classname = att.classname,
-        this.favSubjects = att.favSubjects
+        this.favSubjects = att.favSubjects,
+        this.grade = att.grade
     }
     listsSubjects() {this.favSubjects.forEach(item => console.log(item))}
     PRAssignment(subject) {return `${this.name} has submitted a PR for ${subject}`}
     sprintChallenge(subject) {return `${this.name} has begun sprint challenge on ${subject}`}
+    graduate() {
+        if (this.grade >= 70) {
+            return `${this.name} is ready to graduate! Congrats!`
+        }else {
+            let pointsleft = 70 - this.grade
+            return `${this.name} needs ${pointsleft} more points to graduate, keep studying!`}
+    }
 }
 
 class ProjectManager extends Instructor{
@@ -122,7 +141,7 @@ const barney = new Instructor({
     catchPhrase: "Stay out of trouble"
 });
 
-const robert = new Student({
+let robertagain = new Student({
     name: 'Robert',
     location: 'Portland',
     age: 35,
@@ -134,9 +153,11 @@ const robert = new Student({
         'Pizza making',
         'Lunch time',
     ],
+    grade: 55
 });
 
-const bill = new Student({
+
+let bill = new Student({
     name: 'Bill',
     location: 'Encino',
     age: 32,
@@ -148,15 +169,16 @@ const bill = new Student({
         'Science',
         'Circadian rhythm biology',
     ],
+    grade: 21
 });
 
 const joscelyn = new ProjectManager({
     name: 'Joscelyn',
     location: 'Nyan Cat',
-    age: 30,
-    favLanguage: 'Something',
-    specialty: 'Donuts',
-    catchPhrase: "Let's zoom",
+    age: 29,
+    favLanguage: 'JavaScript',
+    specialty: 'Super Smash Bros',
+    catchPhrase: "Gotta Catch 'Em All",
     gradClassName: 25,
     favInstructor: 'Josh'
 });
@@ -180,3 +202,24 @@ const jimbo = new ProjectManager({
 // * Add a graduate method to a student.
 //   * This method, when called, will check the grade of the student and see if they're ready to graduate from Lambda School
 //   * If the student's grade is above a 70% let them graduate! Otherwise go back to grading their assignments to increase their score.
+
+console.log ("***********Lambda School of Hard Knocks*********************")
+
+console.log (robertagain.graduate())
+console.log (bill.graduate())
+console.log (joscelyn.scoring(bill))
+console.log (bill.graduate())
+console.log (joscelyn.scoring(robertagain))
+console.log (robertagain.graduate())
+console.log (jimbo.scoring(robertagain))
+console.log (robertagain.graduate())
+console.log (jimbo.scoring(bill))
+console.log (bill.graduate())
+console.log (joscelyn.scoring(robertagain))
+console.log (robertagain.graduate())
+console.log (jimbo.scoring(bill))
+console.log (bill.graduate())
+console.log (joscelyn.scoring(robertagain))
+console.log (robertagain.graduate())
+console.log (jimbo.scoring(bill))
+console.log (bill.graduate())
