@@ -8,14 +8,14 @@ Prototype Refactor
 
 */
 
-function GameObject (attr) {
-    this.createdAt = attr.createdAt;
-    this.name = attr.name;
-    this.dimensions = attr.dimensions;
+class GameObject{
+    constructor (attr) {
+      this.createdAt = attr.createdAt;
+      this.name = attr.name;
+      this.dimensions = attr.dimensions;
+    }
+    destroy () {return `${this.name} was removed from the game.`};
   }
-  
-  GameObject.prototype.destroy = function (){return `${this.name} was removed from the game.`};
-  
   
   
   /*
@@ -25,14 +25,13 @@ function GameObject (attr) {
     * should inherit destroy() from GameObject's prototype
   */
   
-  function CharacterStats (charattr){
-    GameObject.call(this, charattr);
-    this.healthPoints = charattr.healthPoints;
+  class CharacterStats extends GameObject{
+    constructor(attr){
+      super(attr);
+      this.healthPoints = attr.healthPoints;   
+    }
+    takeDamage () {return `${this.name} took damage.`};
   }
-  
-  CharacterStats.prototype = Object.create(GameObject.prototype);
-  
-  CharacterStats.prototype.takeDamage = function () {return `${this.name} took damage.`};
   
   /*
     === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -44,19 +43,16 @@ function GameObject (attr) {
     * should inherit takeDamage() from CharacterStats
   */
   
-  function Humanoid (humattr){
-    GameObject.call(this, humattr);
-    CharacterStats.call(this, humattr);
-    this.team = humattr.team;
-    this.weapons = humattr.weapons;
-    this.language = humattr.language;
+  class Humanoid extends CharacterStats{
+    constructor (attr){
+      super (attr);
+      this.team = attr.team;
+      this.weapons = attr.weapons;
+      this.language = attr.language;
+    }
+    greet () {return `${this.name} offers a greeting in ${this.language}.`};
   }
   
-  Humanoid.prototype = Object.create(CharacterStats.prototype);
-  
-  Humanoid.prototype.greet = function () {
-    return `${this.name} offers a greeting in ${this.language}.`;
-  }
   
   /*
     * Inheritance chain: GameObject -> CharacterStats -> Humanoid
@@ -134,24 +130,15 @@ function GameObject (attr) {
     // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
     // * Create two new objects, one a villain and one a hero and fight it out with methods!
   /////////////Villain constructor:
-    function Villain (vilattr){
-      GameObject.call(this, vilattr);
-      CharacterStats.call(this, vilattr);
-      Humanoid.call(this, vilattr);
-      this.superpower = vilattr.superpower;
-      
-    }
-    
-    Villain.prototype = Object.create(Humanoid.prototype);
   
-    Villain.prototype.laugh = function () {
-      return `${this.name} laughs at you in ${this.language}!`;
+  class Villain extends Humanoid{
+    constructor (attr){
+      super (attr);
+      this.superpower = attr.superpower;
     }
-    Villain.prototype.nodamage = function () {
-      return `${this.name} brushes his shoulders and shows off his ${this.superpower}!`;
-    }
-  
-    Villain.prototype.checkDamage = function (attackweapon, damagecount) {
+    laugh () {return `${this.name} laughs at you in ${this.language}!`};
+    nodamage () {return `${this.name} brushes his shoulders and shows off his ${this.superpower}!`};
+    checkDamage (attackweapon, damagecount) {
       console.log (`Your weapon: ${attackweapon}, attacks ${this.name}'s health of ${this.healthPoints} with ${damagecount} damage!`);
       if (damagecount > this.healthPoints){
         console.log (this.takeDamage());
@@ -160,58 +147,54 @@ function GameObject (attr) {
         console.log (this.nodamage());
       }
     }
+  }
   ////////////Hero constructor:
-    function Hero (heroattr){
-      GameObject.call(this, heroattr);
-      CharacterStats.call(this, heroattr);
-      Humanoid.call(this, heroattr);
-      Villain.call(this, heroattr);
+  class Hero extends Villain{
+    constructor (attr){
+      super (attr);
     }
-    
-    Hero.prototype = Object.create(Villain.prototype);
-    
-    Hero.prototype.boast = function () {
-      return `${this.name} boasts they will destroy you with a ${this.weapons[0]} and ${this.weapons[1]}!`;
-    }
+    boast () {return `${this.name} boasts they will destroy you with a ${this.weapons[0]} and ${this.weapons[1]}!`};
+  }
+
   
-    const trevor = new Villain({
-      createdAt: new Date(),
-      dimensions: {
-        length: 1,
-        width: 2,
-        height: 4,
-      },
-      healthPoints: 11,
-      name: 'Trevor',
-      team: "Trevor's Baddies",
-      weapons: [
-        'Pen',
-        'Bazooka',
-      ],
-      language: 'Dork',
-      superpower: 'Ice cold stare',
-    });
-  
-    const robert = new Hero({
-      createdAt: new Date(),
-      dimensions: {
-        length: 1,
-        width: 2,
-        height: 4,
-      },
-      healthPoints: 9000,
-      name: 'Robert',
-      team: 'Ro Ro',
-      weapons: [
-        'RGB Keyboard',
-        'High speed internet connection',
-      ],
-      language: 'Nerd',
-      superpower: 'Fabulous hair',
-    });
-    console.log(trevor.checkDamage(robert.weapons[0],3)) //Your weapon: RGB Keyboard, attacks Trevor's health of 11 with 3 damage! - Trevor laughs at you in Dork! - Trevor brushes his shoulders and shows off his Ice cold stare!
-    console.log(robert.checkDamage(trevor.weapons[1],10)) // Your weapon: Bazooka, attacks Robert's health of 9000 with 10 damage! - Robert laughs at you in Nerd! - Robert brushes his shoulders and shows off his Fabulous hair!
-  
-    // console.log(trevor.laugh())
-  
-    // console.log(robert.boast())
+  const trevor = new Villain({
+    createdAt: new Date(),
+    dimensions: {
+      length: 1,
+      width: 2,
+      height: 4,
+    },
+    healthPoints: 11,
+    name: 'Trevor',
+    team: "Trevor's Baddies",
+    weapons: [
+      'Pen',
+      'Bazooka',
+    ],
+    language: 'Dork',
+    superpower: 'Ice cold stare',
+  });
+
+  const robert = new Hero({
+    createdAt: new Date(),
+    dimensions: {
+      length: 1,
+      width: 2,
+      height: 4,
+    },
+    healthPoints: 9000,
+    name: 'Robert',
+    team: 'Ro Ro',
+    weapons: [
+      'RGB Keyboard',
+      'High speed internet connection',
+    ],
+    language: 'Nerd',
+    superpower: 'Fabulous hair',
+  });
+  console.log(trevor.checkDamage(robert.weapons[0],3)) //Your weapon: RGB Keyboard, attacks Trevor's health of 11 with 3 damage! - Trevor laughs at you in Dork! - Trevor brushes his shoulders and shows off his Ice cold stare!
+  console.log(robert.checkDamage(trevor.weapons[1],10)) // Your weapon: Bazooka, attacks Robert's health of 9000 with 10 damage! - Robert laughs at you in Nerd! - Robert brushes his shoulders and shows off his Fabulous hair!
+
+  // console.log(trevor.laugh())
+
+  // console.log(robert.boast())
